@@ -1,0 +1,12 @@
+S --> ADV S
+S --> S ADV
+S --> NP VP
+S --> S PP
+NP--> DET N
+VP --> V NP
+VP --> V PP
+VP --> VP ADV
+VP --> VP PP
+PP --> P NP
+PP --> N DP
+NP --> NP PP

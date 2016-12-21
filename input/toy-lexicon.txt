@@ -1,0 +1,22 @@
+V --> spills
+V --> wastes
+V --> drinks
+V --> likes
+V --> man
+DET--> an
+DET --> a
+DET --> the
+N --> espresso
+N --> table
+N --> cupboard
+N --> bar
+N --> man
+N --> beer
+N --> wastes
+N --> likes
+P --> on
+P --> under
+P --> below
+ADV --> soon
+ADV --> today
+ADV --> later
