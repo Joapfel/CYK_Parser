@@ -2,6 +2,9 @@ package de.ws1617.pccl.parser;
 
 import de.ws1617.pccl.tree.*;
 import java.util.List;
+
+import javax.naming.ldap.LdapName;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,9 +65,14 @@ public class CYK {
 			HashSet<NonTerminal> setOfNt = this.lexicon.get(word);
 
 			for (NonTerminal nt : setOfNt) {
+
+				// for storing in the two-dim-array
 				HashMap<NonTerminal, ArrayList<Tree<Symbol>>> tmp = new HashMap<>();
+				// in the value in the hashmap
 				Tree<Symbol> tree = new Tree(word);
+				// value in the hashmap
 				ArrayList<Tree<Symbol>> listOfTrees = new ArrayList<>();
+
 				listOfTrees.add(tree);
 				tmp.put(nt, listOfTrees);
 				chart[k - 1][k] = tmp;
@@ -105,9 +113,13 @@ public class CYK {
 													ArrayList<Tree<Symbol>> children = new ArrayList<>();
 													children.add(0, treesIJ);
 													children.add(1, treesJK);
-													/*newTree.addChild(treesIJ);
-													newTree.addChild(treesJK);*/
-													newTree.setChildren(children);
+													/*
+													 * newTree.addChild(treesIJ)
+													 * ;
+													 * newTree.addChild(treesJK)
+													 * ;
+													 */
+													newTree.setChildren(children);    
 
 													// add all the new trees to
 													// a array list
@@ -119,7 +131,7 @@ public class CYK {
 
 													// fill the chart at [i][k]
 													chart[i][k].put(rule.getLhs(), value);
-													
+
 												}
 
 											}
