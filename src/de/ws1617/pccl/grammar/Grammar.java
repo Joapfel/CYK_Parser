@@ -1,5 +1,6 @@
 package de.ws1617.pccl.grammar;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +43,7 @@ public class Grammar {
 	 * @param lhs the rule left hand side.
 	 * @param rhs the rule right hand side.
 	 */
-	public void addRule(NonTerminal lhs, ArrayList<Symbol> rhs) {
+	public void addRule(NonTerminal lhs, ArrayList<Symbol> rhs){
 		addKey(lhs);
 		rules.get(lhs).add(rhs);
 		for (int i = 0; i < rhs.size(); i++) {
