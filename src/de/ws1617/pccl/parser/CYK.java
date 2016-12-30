@@ -4,6 +4,7 @@ import de.ws1617.pccl.tree.*;
 import java.util.List;
 
 import javax.naming.ldap.LdapName;
+import javax.swing.plaf.synth.SynthSeparatorUI;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,14 +45,14 @@ public class CYK {
 	}
 
 	public void initialize(int length) {
-		chart = new HashMap[length + 1][length + 1];
+		this.chart = new HashMap[length + 1][length + 1];
 	}
 
 	public HashMap<NonTerminal, ArrayList<Tree<Symbol>>> parse(String inputString) {
 
 		int length = inputString.split("\\s+").length;
 		initialize(length);
-
+		
 		// assign the input to terminals
 		String[] in = inputString.split("\\s+");
 		Terminal input[] = new Terminal[length];
@@ -69,7 +70,7 @@ public class CYK {
 				// for storing in the two-dim-array
 				HashMap<NonTerminal, ArrayList<Tree<Symbol>>> tmp = new HashMap<>();
 				// in the value in the hashmap
-				Tree<Symbol> tree = new Tree(word);
+				Tree<Symbol> tree = new Tree<Symbol>(word);
 				// value in the hashmap
 				ArrayList<Tree<Symbol>> listOfTrees = new ArrayList<>();
 
@@ -90,7 +91,7 @@ public class CYK {
 							// [i][k] with the
 							// current rule
 							for (NonTerminal ij : chart[i][j].keySet()) {
-
+								
 								// only go into the second for loop if ij equals
 								// the first rhs element of the rule
 								if (rule.getRhs().get(0).equals(ij)) {
@@ -104,15 +105,17 @@ public class CYK {
 											// for all possible combinations of
 											// trees
 											for (Tree<Symbol> treesIJ : chart[i][j].get(ij)) {
+												System.out.println(treesIJ.getData().getValue());
 												for (Tree<Symbol> treesJK : chart[j][k].get(jk)) {
+													System.out.println(treesJK.getData().getValue());
 
 													// add a new tree pointing
 													// to the
 													// new child nodes
 													Tree<Symbol> newTree = new Tree<Symbol>(rule.getLhs());
 													ArrayList<Tree<Symbol>> children = new ArrayList<>();
-													children.add(0, treesIJ);
-													children.add(1, treesJK);
+													children.add(0, new Tree<Symbol>(treesIJ.getData()));
+													children.add(1, new Tree<Symbol>(treesJK.getData()));
 													/*
 													 * newTree.addChild(treesIJ)
 													 * ;
@@ -130,7 +133,9 @@ public class CYK {
 													value.add(newTree);
 
 													// fill the chart at [i][k]
-													chart[i][k].put(rule.getLhs(), value);
+													HashMap<NonTerminal, ArrayList<Tree<Symbol>>> result = new HashMap<>();
+													result.put(rule.getLhs(), value);
+													chart[i][k] = result;
 
 												}
 
