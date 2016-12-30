@@ -105,9 +105,9 @@ public class CYK {
 											// for all possible combinations of
 											// trees
 											for (Tree<Symbol> treesIJ : chart[i][j].get(ij)) {
-												System.out.println(treesIJ.getData().getValue());
+												
 												for (Tree<Symbol> treesJK : chart[j][k].get(jk)) {
-													System.out.println(treesJK.getData().getValue());
+													
 
 													// add a new tree pointing
 													// to the
