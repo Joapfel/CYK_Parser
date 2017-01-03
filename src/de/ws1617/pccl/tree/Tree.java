@@ -117,4 +117,9 @@ public class Tree<T> {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return data + " " + children;
+	}
+
 }

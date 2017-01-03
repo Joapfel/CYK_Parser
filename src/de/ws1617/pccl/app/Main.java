@@ -20,17 +20,19 @@ public class Main {
 	public static void main(String[] args) {
 
 		// TODO instantiate a CYK parser and parse a sentence
-		if (args.length != 3) {
-			System.err.println("required aruments: grammar, lexicon, input-sentence");
+		if (args.length != 5) {
+			System.err.println("required aruments:\n path to the grammar file,\n path to the lexicon file,\n startSymbol,\n input-sentence,\n number of parses to show\n");
 		}
 		try {
-			String path = args[0];
-			Lexicon lexicon = GrammarUtils.readLexicon(args[1]);
-			String input = args[2];
+			String pathGrammar = args[0];
+			String pathLexicon = args[1];
+			NonTerminal startSymbol = new NonTerminal(args[2]);
+			String input = args[3];
+			int show = Integer.parseInt(args[4]);
 
-			CYK cyk = new CYK(path, lexicon);
+			CYK cyk = new CYK(pathGrammar, pathLexicon);
 			HashMap<NonTerminal, ArrayList<Tree<Symbol>>> parses = cyk.parse(input);
-			cyk.prettyParse(parses);
+			System.out.println(cyk.prettyParse(parses, startSymbol, show));
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
