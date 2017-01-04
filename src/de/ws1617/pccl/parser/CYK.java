@@ -2,6 +2,7 @@ package de.ws1617.pccl.parser;
 
 import de.ws1617.pccl.tree.*;
 import java.util.List;
+import java.util.Stack;
 
 import javax.naming.ldap.LdapName;
 import javax.swing.plaf.synth.SynthSeparatorUI;
@@ -176,8 +177,9 @@ public class CYK {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
 
 		while ((line = br.readLine()) != null) {
-			if (line.trim().equals("")) continue;
-			
+			if (line.trim().equals(""))
+				continue;
+
 			String[] splt = line.split("-->");
 			String lhs = splt[0].trim();
 			// holds two nonterminals because chomsky normal form
@@ -205,7 +207,8 @@ public class CYK {
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
 
 		while ((line = br.readLine()) != null) {
-			if (line.trim().equals("")) continue;
+			if (line.trim().equals(""))
+				continue;
 
 			String[] splt = line.split("-->");
 			String lhs = splt[0].trim();
@@ -222,6 +225,95 @@ public class CYK {
 		}
 
 		return result;
+	}
+
+	public HashSet<Rule> readInGrammarATIS(String path) throws IOException {
+		HashSet<Rule> result = new HashSet<>();
+
+		String line = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
+
+		Rule rule = new Rule(null, null);
+		// lhs is assigned after a empty line
+		NonTerminal lhsSymb = null;
+		// rhs is assigned after the first line of a block
+		ArrayList<Symbol> rhsList = null;
+		boolean firstLine = true;
+
+		while ((line = br.readLine()) != null) {
+
+			// operation on lhs
+			if (line.trim().equals("") || firstLine) {
+
+				// needed only for the first block
+				firstLine = false;
+
+				// if it was empty read the next line which is lhs
+				if (line.equals("")) {
+					line = br.readLine();
+				}
+
+				// it should be only one word so no need to split
+				String lhs = line.trim();
+
+				// the rule left hand side
+				lhsSymb = new NonTerminal(lhs);
+
+				// create the rule
+				rule.setLhs(lhsSymb);
+
+				// go to the next line
+				line = br.readLine();
+
+			}
+			if (!line.trim().equals("")) {
+				// iterate over rhs
+				String[] rhsSplit = line.split("\\s+");
+				rhsList = new ArrayList<>();
+				for (int i = 0; i < rhsSplit.length; i++) {
+					String symb = rhsSplit[i];
+					Symbol s = new NonTerminal(symb);
+					rhsList.add(s);
+				}
+				rule.setRhs(rhsList);
+
+			}
+			if (rule.getLhs() != null && rule.getRhs() != null) {
+				result.add(rule);
+			}
+
+		}
+
+		br.close();
+		return result;
+	}
+
+	public HashMap<Terminal, HashSet<NonTerminal>> readInLexcionATIS(String path) throws IOException {
+		HashMap<Terminal, HashSet<NonTerminal>> result = new HashMap<>();
+
+		String line = "";
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(path))));
+
+		while ((line = br.readLine()) != null) {
+			if (line.trim().equals(""))
+				continue;
+
+			String[] splt = line.split("\\s+");
+			String lhs = splt[1].trim();
+			String rhs = splt[0].trim();
+			NonTerminal leftHandSide = new NonTerminal(lhs);
+			Terminal rightHandSide = new Terminal(rhs);
+			if (!result.containsKey(leftHandSide)) {
+				result.put(rightHandSide, new HashSet<>());
+				result.get(rightHandSide).add(leftHandSide);
+			} else {
+				result.get(rightHandSide).add(leftHandSide);
+			}
+
+		}
+
+		return result;
+
 	}
 
 	public HashMap<NonTerminal, ArrayList<Tree<Symbol>>>[][] getChart() {
@@ -296,8 +388,73 @@ public class CYK {
 		result = result.replaceAll(",", "");
 		result = result.replaceAll(" \\]", "]");
 		result = result.trim();
+		showRules(result);
+		return "Total number of parses: " + totalNumberOfParses + "\n\n" + show + " parse(s) is/are shown: " + "\n\n"
+				+ result;
+	}
 
-		return "Total number of parses: " + totalNumberOfParses + "\n\n" + show + " parses are shown: " + "\n\n" + result;
+	/**
+	 * takes a string of the form S [ADV [soon] S [NP [DET [the] N [man]]]]...
+	 * and forms it in to its rules S -> ADV S ADV -> soon S -> NP NP -> DET N
+	 * DET -> the N -> man
+	 * 
+	 * @param prettyParse
+	 */
+	public void showRules(String prettyParse) {
+		//prettyParse = "S [ADV [soon] S [NP [DET [the] N [man]]]";
+		Stack<ArrayList<String>> stack = new Stack<>();
+
+		String[] elements = prettyParse.split("\\s+");
+		for (int i = 0; i < elements.length; i++) {
+
+			if (elements[i].startsWith("[")) {
+				StringBuilder sb = new StringBuilder();
+				sb.append(elements[i - 1]);
+				sb.append(" --> ");
+				sb.append(elements[i].substring(0, elements[i].length()));
+				String rule = sb.toString().replaceAll("\\[", "");
+				rule = rule.replaceAll("\\]", "");
+
+				String[] tmp = rule.split("\\s+");
+				ArrayList<String> list = new ArrayList<>();
+				for (String s : tmp) {
+					list.add(s);
+				}
+				stack.push(list);
+			}
+			if (elements[i].endsWith("]")) {
+				String wordAtI = elements[i];
+
+				while (wordAtI.endsWith("]") && stack.size()>1) {
+					
+					for(String s : stack.peek()){
+						System.out.print(s + " ");
+					}
+					System.out.println();
+					
+					String lhs = stack.pop().get(0);
+					String rhs = stack.peek().get(2);
+					// if not the same add lhs to rhs
+					if (!lhs.equals(rhs)) {
+						ArrayList<String> list = stack.pop();
+						String tmp = list.get(2);
+						tmp = tmp + " " + lhs;
+						list.set(2, tmp);
+						stack.push(list);
+					
+					}
+					wordAtI = wordAtI.substring(0, wordAtI.length()-1);
+				}
+			}
+
+		}
+		while (!stack.isEmpty()) {
+
+			for(String s : stack.pop()){
+				System.out.print(s + " ");
+			}
+			System.out.println();
+		}
 	}
 
 }
