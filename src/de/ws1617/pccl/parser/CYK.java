@@ -2,6 +2,7 @@ package de.ws1617.pccl.parser;
 
 import de.ws1617.pccl.tree.*;
 import java.util.List;
+import java.util.Queue;
 import java.util.Stack;
 
 import javax.naming.ldap.LdapName;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import de.ws1617.pccl.grammar.Grammar;
 import de.ws1617.pccl.grammar.Lexicon;
@@ -401,8 +403,9 @@ public class CYK {
 	 * @param prettyParse
 	 */
 	public void showRules(String prettyParse) {
-		//prettyParse = "S [ADV [soon] S [NP [DET [the] N [man]]]";
+		// prettyParse = "S [ADV [soon] S [NP [DET [the] N [man]]]";
 		Stack<ArrayList<String>> stack = new Stack<>();
+		ArrayList<ArrayList<String>> store = new ArrayList<>();
 
 		String[] elements = prettyParse.split("\\s+");
 		for (int i = 0; i < elements.length; i++) {
@@ -420,18 +423,15 @@ public class CYK {
 				for (String s : tmp) {
 					list.add(s);
 				}
+				//add the list for further processing 
 				stack.push(list);
+				store.add(list);
 			}
 			if (elements[i].endsWith("]")) {
 				String wordAtI = elements[i];
 
-				while (wordAtI.endsWith("]") && stack.size()>1) {
-					
-					for(String s : stack.peek()){
-						System.out.print(s + " ");
-					}
-					System.out.println();
-					
+				while (wordAtI.endsWith("]") && stack.size() > 1) {
+
 					String lhs = stack.pop().get(0);
 					String rhs = stack.peek().get(2);
 					// if not the same add lhs to rhs
@@ -441,20 +441,21 @@ public class CYK {
 						tmp = tmp + " " + lhs;
 						list.set(2, tmp);
 						stack.push(list);
-					
+
 					}
-					wordAtI = wordAtI.substring(0, wordAtI.length()-1);
+					wordAtI = wordAtI.substring(0, wordAtI.length() - 1);
 				}
 			}
 
 		}
-		while (!stack.isEmpty()) {
-
-			for(String s : stack.pop()){
+		//print the result
+		for (ArrayList<String> iter : store) {
+			for (String s : iter) {
 				System.out.print(s + " ");
 			}
 			System.out.println();
 		}
+
 	}
 
 }
