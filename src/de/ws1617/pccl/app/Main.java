@@ -25,7 +25,7 @@ public class Main {
 
 		// TODO instantiate a CYK parser and parse a sentence
 		if (args.length != 5) {
-			System.err.println("required aruments:\n path to the grammar file,\n path to the lexicon file,\n startSymbol,\n input-sentence,\n number of parses to show\n");
+			System.err.println("required arguments:\n path to the grammar file,\n path to the lexicon file,\n startSymbol,\n input-sentence,\n number of parses to show\n");
 		}
 		try {
 			String pathGrammar = args[0];
@@ -36,30 +36,33 @@ public class Main {
 
 			CYK cyk = new CYK(pathGrammar, pathLexicon);
 			HashMap<NonTerminal, ArrayList<Tree<Symbol>>> parses = cyk.parse(input);
-			System.out.println(cyk.prettyParse(parses, startSymbol, show));
 			
+			//get the result in from of a syntax tree with brackets
+			ArrayList<String> differentParses = cyk.prettyParse(parses, startSymbol);
+			System.out.println("Total number of parses: " + differentParses.size());
+			if(show > differentParses.size()){
+				show = differentParses.size();
+			}
+			System.out.println("Number of parses shown: " + show);
+			System.out.println();
 			
-			//OPTIONAL
-			/*HashSet<Rule> atis = cyk.readInGrammarATIS("input/atis_grammar.txt");
-			for(Rule rule : atis){
+			for(int i = 0; i < show; i++){
+				
+				//print parse
+				System.out.println(differentParses.get(i));
 				System.out.println();
-				System.out.println(rule.getLhs().getValue() + " -->");
-				for(Symbol s : rule.getRhs()){
-					System.out.print(" " + s.getValue() + " ");
-				}
 				
-			}*/
-			
-			/*HashMap<Terminal, HashSet<NonTerminal>> result = cyk.readInLexcionATIS("input/atis_lexicon.txt");
-			for(Terminal t : result.keySet()){
-				for(NonTerminal nt : result.get(t)){
-				
-					System.out.print(t.getValue() + " ");
-					System.out.println(nt.getValue());
-					
+				//print the parse in form of rules
+				ArrayList<ArrayList<String>> result = cyk.showRules(differentParses.get(i));
+				for (ArrayList<String> iter : result) {
+					for (String s : iter) {
+						System.out.print(s + " ");
+					}
+					System.out.println();
 				}
-			}*/
-			
+				System.out.println();
+				System.out.println("-------------------------------------------------------");
+			}
 			
 
 		} catch (IOException e) {

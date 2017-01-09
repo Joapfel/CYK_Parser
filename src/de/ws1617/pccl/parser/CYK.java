@@ -369,30 +369,30 @@ public class CYK {
 		return "CYK [chart=" + Arrays.toString(chart) + "]";
 	}
 
-	public String prettyParse(HashMap<NonTerminal, ArrayList<Tree<Symbol>>> slot, NonTerminal startSymbol, int show) {
+	/**
+	 * changes the parses into more readable parses
+	 * @param slot
+	 * @param startSymbol
+	 * @return
+	 */
+	public ArrayList<String> prettyParse(HashMap<NonTerminal, ArrayList<Tree<Symbol>>> slot, NonTerminal startSymbol) {
 
-		StringBuilder sb = new StringBuilder();
-		int totalNumberOfParses = slot.get(startSymbol).size();
-		int numOfParses = 0;
+		ArrayList<String> parses = new ArrayList<>();
 
 		for (Tree<Symbol> tree : slot.get(startSymbol)) {
 
-			if (numOfParses == show)
-				break;
-
-			sb.append(tree.toString() + "\n\n");
-
-			numOfParses++;
+			String result = tree.toString();
+			result = result.replaceAll("null", "");
+			result = result.replaceAll(",", "");
+			result = result.replaceAll(" \\]", "]");
+			result = result.trim();
+			
+			parses.add(result);
+			
 		}
 
-		String result = sb.toString();
-		result = result.replaceAll("null", "");
-		result = result.replaceAll(",", "");
-		result = result.replaceAll(" \\]", "]");
-		result = result.trim();
-		showRules(result);
-		return "Total number of parses: " + totalNumberOfParses + "\n\n" + show + " parse(s) is/are shown: " + "\n\n"
-				+ result;
+		
+		return parses;
 	}
 
 	/**
@@ -402,10 +402,10 @@ public class CYK {
 	 * 
 	 * @param prettyParse
 	 */
-	public void showRules(String prettyParse) {
-		// prettyParse = "S [ADV [soon] S [NP [DET [the] N [man]]]";
+	public ArrayList<ArrayList<String>> showRules(String prettyParse) {
+		
 		Stack<ArrayList<String>> stack = new Stack<>();
-		ArrayList<ArrayList<String>> store = new ArrayList<>();
+		ArrayList<ArrayList<String>> result = new ArrayList<>();
 
 		String[] elements = prettyParse.split("\\s+");
 		for (int i = 0; i < elements.length; i++) {
@@ -425,7 +425,8 @@ public class CYK {
 				}
 				//add the list for further processing 
 				stack.push(list);
-				store.add(list);
+				//add rule to result
+				result.add(list);
 			}
 			if (elements[i].endsWith("]")) {
 				String wordAtI = elements[i];
@@ -448,14 +449,8 @@ public class CYK {
 			}
 
 		}
-		//print the result
-		for (ArrayList<String> iter : store) {
-			for (String s : iter) {
-				System.out.print(s + " ");
-			}
-			System.out.println();
-		}
-
+		
+		return result;
 	}
 
 }
