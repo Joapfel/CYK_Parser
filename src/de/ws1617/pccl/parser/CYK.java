@@ -371,6 +371,7 @@ public class CYK {
 
 	/**
 	 * changes the parses into more readable parses
+	 * 
 	 * @param slot
 	 * @param startSymbol
 	 * @return
@@ -386,12 +387,11 @@ public class CYK {
 			result = result.replaceAll(",", "");
 			result = result.replaceAll(" \\]", "]");
 			result = result.trim();
-			
+
 			parses.add(result);
-			
+
 		}
 
-		
 		return parses;
 	}
 
@@ -403,7 +403,7 @@ public class CYK {
 	 * @param prettyParse
 	 */
 	public ArrayList<ArrayList<String>> showRules(String prettyParse) {
-		
+
 		Stack<ArrayList<String>> stack = new Stack<>();
 		ArrayList<ArrayList<String>> result = new ArrayList<>();
 
@@ -423,9 +423,9 @@ public class CYK {
 				for (String s : tmp) {
 					list.add(s);
 				}
-				//add the list for further processing 
+				// add the list for further processing
 				stack.push(list);
-				//add rule to result
+				// add rule to result
 				result.add(list);
 			}
 			if (elements[i].endsWith("]")) {
@@ -449,7 +449,7 @@ public class CYK {
 			}
 
 		}
-		
+
 		return result;
 	}
 

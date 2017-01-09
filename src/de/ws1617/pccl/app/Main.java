@@ -26,6 +26,8 @@ public class Main {
 		// TODO instantiate a CYK parser and parse a sentence
 		if (args.length != 5) {
 			System.err.println("required arguments:\n path to the grammar file,\n path to the lexicon file,\n startSymbol,\n input-sentence,\n number of parses to show\n");
+			System.out.println("Please read the \"readMe\" file in addition");
+			System.out.println();
 		}
 		try {
 			String pathGrammar = args[0];
