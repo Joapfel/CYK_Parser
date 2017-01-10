@@ -403,47 +403,70 @@ public class CYK {
 	 * @param prettyParse
 	 */
 	public ArrayList<ArrayList<String>> showRules(String prettyParse) {
-
+		//use for processing
 		Stack<ArrayList<String>> stack = new Stack<>();
+		//use for storing the results
 		ArrayList<ArrayList<String>> result = new ArrayList<>();
-
+		
 		String[] elements = prettyParse.split("\\s+");
 		for (int i = 0; i < elements.length; i++) {
 
 			if (elements[i].startsWith("[")) {
 				StringBuilder sb = new StringBuilder();
+				//the element before
 				sb.append(elements[i - 1]);
 				sb.append(" --> ");
+				//the element itself wihtout the [ bracket
 				sb.append(elements[i].substring(0, elements[i].length()));
+				//make clean look without [ ] brackets in order to get a rule
 				String rule = sb.toString().replaceAll("\\[", "");
 				rule = rule.replaceAll("\\]", "");
 
+				//split the rule into this array
 				String[] tmp = rule.split("\\s+");
+				//add Array to ArrayList
 				ArrayList<String> list = new ArrayList<>();
 				for (String s : tmp) {
 					list.add(s);
 				}
-				// add the list for further processing
+				// add the list/rule for further processing
 				stack.push(list);
-				// add rule to result
+				// add list/rule to result
+				// due to reference type the result is kept up to date
+				//if changes are made from
+				//N -> man
+				//NP -> DET
+				//to
+				//N -> man
+				//NP -> DET N
+				//the result is updated automatically
 				result.add(list);
 			}
 			if (elements[i].endsWith("]")) {
+				//store the current word for further processing
 				String wordAtI = elements[i];
-
+				//[man]]]] the loop will be executed four times
 				while (wordAtI.endsWith("]") && stack.size() > 1) {
-
+					//get the lhs of the current rule and pop
 					String lhs = stack.pop().get(0);
+					//compare it to the rhs of the next rule
 					String rhs = stack.peek().get(2);
+					
 					// if not the same add lhs to rhs
+					//in order to change
+					//N -> man
+					//NP -> DET
+					//into
+					//N -> man
+					//NP -> DET N 
 					if (!lhs.equals(rhs)) {
 						ArrayList<String> list = stack.pop();
 						String tmp = list.get(2);
 						tmp = tmp + " " + lhs;
 						list.set(2, tmp);
 						stack.push(list);
-
 					}
+					//delete the last element from the word in order to reduce the brackets
 					wordAtI = wordAtI.substring(0, wordAtI.length() - 1);
 				}
 			}
